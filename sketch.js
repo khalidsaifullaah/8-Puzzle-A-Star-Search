@@ -1,8 +1,12 @@
+// All the variables required
 let screen;
 let started = false;
 let startButton;
-let fr = 5; //starting FPS
+let fr = 60; //starting FPS
+let x_axis
+let y_axis
 
+let resolution
 let board
 let pseudo_board
 let previousNode
@@ -16,17 +20,33 @@ let initial_i
 let initial_j
 let moves = 0
 let shift = 0
+let shift2 = 0
 let visualDone = false
 let requiredMoves
 let tilesReordered = []
 let calledFromTilesReordered = false
+let ordered = true
 
-function centerCanvas() {
-    var x = (windowWidth - width) / 2;
-    var y = (windowHeight - height) / 2;
-    screen.position(x, y);
+
+//Code for the pop up
+lightBoxClose = function () {
+    document.querySelector(".lightbox").classList.add("closed");
 }
 
+
+// Centers the canvas on screen
+function centerCanvas(x, y) {
+    screen.position((windowWidth - x) / 2, (windowHeight - y) / 4);
+}
+
+
+// ensures responsiveness
+function windowResized() {
+    centerCanvas();
+}
+
+
+// it creates and returns a 2D Array
 function twoDArray(rows, cols) {
     let arrays = new Array(rows);
     for (let i = 0; i < arrays.length; i++) {
@@ -35,47 +55,91 @@ function twoDArray(rows, cols) {
     return arrays;
 }
 
-function setup() {
-    screen = createCanvas(850, 850);
-    screen.parent("sketch01")
 
+function setup() {
+    //checking the device's screen size for responsiveness
+    if (windowWidth > 540 && windowHeight > 960) {
+        resolution = 200
+        x_axis = 600
+        y_axis = 600
+
+        console.log((windowWidth - x_axis), windowHeight)
+    }
+    else {
+        resolution = 100
+        x_axis = 300
+        y_axis = 300
+    }
+
+    // creating our canvas
+    screen = createCanvas(x_axis, y_axis);
+    screen.parent("sketch01")
     background(17, 75, 95);
     frameRate(fr)
+
+    //the "board" is the visual board & the "pseudo_board" is for all the calculation 
+    // and the algorithm to run upon
     board = twoDArray(size, size)
     pseudo_board = twoDArray(size, size)
-    startButton = createButton("Start");
-    startButton.addClass("btn-lg btn-success");
-    startButton.position(windowWidth - 800, 800);
-    startButton.mousePressed(start);
-    startButton.parent("sketch01");
-    let name = 1
-    // pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
-    pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
+
+    //title creation
+    titleDiv = createDiv('');
+    titleDiv.html('<h2 class = "title"><strong><u>8 Puzzle</u></strong></h2>');
+    titleDiv.position(0, 10);
+    titleDiv.style('font-size', '26px');
+    titleDiv.style('width', '100%');
+    titleDiv.style('text-align', 'center');
+    // let startBtn = document.querySelector(".startBtn");
+    // startBtn.style.width = '20%'
+    // startBtn.setAttribute("id", "solveBtn")
+    // startBtn.addEventListener('mouseup', start)
+
+    //creating A.I Help button
+    startButton = createDiv('');
+    startButton.html('<button type="button" class="mt-5 btn btn-warning startBtn "><strong>Get A.I\'s Help</strong></button>');
+    startButton.position(0, ((windowHeight - y_axis) / 4) + y_axis);
+    startButton.style('font-size', '26px');
+    startButton.style('width', '100%');
+    startButton.style('text-align', 'center');
+    let startBtn = document.querySelector(".startBtn");
+    startBtn.style.width = '20%'
+    startBtn.setAttribute("id", "solveBtn")
+    startBtn.addEventListener('mouseup', start)
+    
+
+    //some initial states for the board
+    pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
+    // pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
     // pseudo_board = [[8, 5, 2], ["", 4, 3], [6, 7, 1]]
+
+    //creating and visualizing the board
+    let name = 1
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++ , name++) {
             board[i][j] = new Tile(i, j, pseudo_board[i][j])
-            // pseudo_board[i][j] = name
             goal_board[name] = [j, i]
         }
     }
     for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++ , name++) {
-            board[i][j].show(color(69, 105, 144))
+        for (let j = 0; j < size; j++) {
+            board[i][j].show(color(138, 198, 209))
         }
     }
-    // initial = JSON.parse(JSON.stringify(board))
-    // console.log(initial)
 
-    blank_i = 1
-    blank_j = 1
-    initial_i = 1
-    initial_j = 1
+    //keeping track of the blank tile
+    blank_i = 0
+    blank_j = 0
+
+    //saving the initial position of the blank tile for visual purpose at the end
+    initial_i = 0
+    initial_j = 0
+
+    //setting up the blank tile
     board[blank_i][blank_j].blank = true
     board[blank_i][blank_j].name = ""
     board[blank_i][blank_j].show(null)
-    blank = board[blank_i][blank_j]
-    // pseudo_board[blank_i][blank_j] = ""
+
+    //pushing the initial state in the queue
     let huristics = manhattanDistance(pseudo_board)
     priorityQ.push([
         pseudo_board,
@@ -84,37 +148,59 @@ function setup() {
         0 + huristics,
         []
     ])
-    previousNode = pseudo_board
-    // priorityQ.push({
-    //     "searchNode": pseudo_board,
-    //     "gScore": 0,
-    //     "huristics": huristics,
-    //     "fScore": 0 + huristics,
-    // })
-    centerCanvas();
 
+    //keeping track of previous node for optimization purpose
+    previousNode = pseudo_board
+
+    centerCanvas(x_axis, y_axis);
 }
+
 
 async function draw() {
     if (started) {
-        if (!inGoalState() && priorityQ.length > 0) {
+        // We're undoing all user's moves and returning to the initial state here
+        if (!ordered) {
+            fr = 3
+            frameRate(fr)
+
+            console.log(blank_i, blank_j)
+            if (shift2 < tilesReordered.length) {
+                calledFromTilesReordered = true
+                console.log("tile>>>", tilesReordered[shift2], shift2)
+                await moveTile(board, tilesReordered[shift2], blank_i, blank_j)
+                shift2++
+            }
+            else {
+                shift2 = 0
+                tilesReordered = []
+                ordered = true
+            }
+        }
+
+        // This is where all the magic happens of A*
+        else if (!inGoalState() && priorityQ.length > 0) {
             fr = 60
             frameRate(fr)
+
+            // taking the state/node from the queue which has the lowest f(n); where f(n) = g(n)+h(n)
             const current = lowestFscoreState()
             moves++
+
+            // it contains the board of the current "best" state
             const currentState = current[0]
 
             //finding the blank tile's position in the board
-            setBlankTiles(currentState)
+            findBlankTile(currentState)
 
-            console.log("in1", JSON.stringify(currentState))
+            // finding out the movable tiles at the moment
             const adjacentTiles = adjacentToBlankTiles(blank_i, blank_j, currentState)
-            // console.log("in2", index)
+
             //removing the "current" state from the queue
             priorityQ = priorityQ.filter(item => item !== current)
             console.log("in3", JSON.stringify(adjacentTiles, ">>>", blank_i, blank_j))
+
+            // getting all the successor states of the current state and pushing them in the queue
             for (tile of adjacentTiles) {
-                console.log("calling", JSON.stringify(currentState))
                 const nextState = generateState(currentState, tile)
                 if (JSON.stringify(nextState) != JSON.stringify(previousNode)) {
                     const huristics = manhattanDistance(nextState)
@@ -128,24 +214,18 @@ async function draw() {
                         [tile].concat(current[4])
                     ])
                 }
-                else { console.log("HERE I'M") }
             }
-            // revealing the current state of the board
+
+
+            // setting our board's (pseudo board) value as like the best board at the moment 
+            // which is the board of the current state
             for (let i = 0; i < size; i++) {
                 for (let j = 0; j < size; j++) {
                     if (currentState[i][j] === "") {
-                        // board[i][j].blank = true
-                        // board[i][j].name = ""
                         pseudo_board[i][j] = ""
-                        // board[blank_i][blank_j].show(color(1111))
-                        // frameRate(fr)
                     }
                     else {
-                        // board[i][j].blank = false
-                        // board[i][j].name = currentState[i][j]
                         pseudo_board[i][j] = currentState[i][j]
-                        // board[i][j].show(color(56, 140, 207))
-
                     }
                 }
             }
@@ -155,12 +235,17 @@ async function draw() {
             console.table(pseudo_board)
             console.log("TILES TO MOVE", "!!!!", current[4])
 
-        } else {
-            fr = 5
+        }
+
+        // After completing A* search & getting our result, we move the tiles here in the actual board for visualization
+        else {
+            //low frame rate so that the tiles doesn't move like flash!
+            fr = 3
             frameRate(fr)
             priorityQ = []
             if (!visualDone) {
                 if (shift < requiredMoves.length) {
+                    // using promise(async-await) for synchronisity
                     await moveTile(board, requiredMoves[shift], initial_i, initial_j)
                     shift++
                 }
@@ -168,40 +253,62 @@ async function draw() {
                     visualDone = true
                 }
             }
+
+            // Here we terminate our game by showing some message to the user
             else {
+                // puzzle solve message
+                var div = createDiv('');
+                div.html('<h1>Puzzle is solved!</h1>');
+                div.position(0, ((windowHeight - y_axis) / 4) + y_axis + 100);
+                div.style('font-size', '24px');
+                div.style('width', '100%');
+                div.style('text-align', 'center');
+                div.style('color', 'rgb(206, 15, 61)');
+
+                // play again prompt button
+                var div2 = createDiv('');
+                div2.html('<button type="button" class="btn btn-success" style = "background-color: #142850;" onClick="window.location.reload();">Play Again</button>');
+                div2.position(0, ((windowHeight - y_axis) / 4) + y_axis + 150);
+                div2.style('font-size', '24px');
+                div2.style('width', '100%');
+                div2.style('text-align', 'center');
+
+                // disabling the solve button
+                const startBtn = document.getElementsByClassName("startBtn");
+                startBtn[0].disabled = true
+                startBtn[0].style.color = 'rgb(221, 221, 221)'
+                startBtn[0].style.backgroundColor = 'rgb(150, 119, 119)'
+                startBtn[0].textContent = "Solved!";
                 noLoop();
                 console.log(`We're Done with ${moves - 1} moves!`)
             }
         }
     }
 }
+
+
+// When start button is clicked, the function executes and the algorithm starts
 function start() {
-    console.log(blank_i, blank_j)
     tilesReordered = tilesReordered.reverse()
-    for (tile of tilesReordered) {
-        fr = 5
-        frameRate(fr)
-        calledFromTilesReordered = true
-        moveTile(board, tile, blank_i, blank_j)
-    }
-    tilesReordered = []
-    console.log(blank_i, blank_j)
+
+    var startBtn = document.querySelector(".startBtn")
+    startBtn.style.backgroundColor = "#23272b"
+    startBtn.style.color = "white"
+    startBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm text-danger" role="status" aria-hidden="true"></span> Solving...'
+    
     started = true;
     loop();
 }
 
-function windowResized() {
-    centerCanvas();
-}
 
+// moves a tile in a board 
 async function moveTile(board, tile, x, y) {
-    let flag = 0
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             if (board[i][j].name === tile) {
                 board[x][y].blank = false
                 board[x][y].name = board[i][j].name
-                board[x][y].show(color(69, 105, 144))
+                board[x][y].show(color(138, 198, 209))
                 board[i][j].blank = true
                 board[i][j].name = ""
                 initial_i = i
@@ -216,67 +323,71 @@ async function moveTile(board, tile, x, y) {
                 board[i][j].show(color(1111))
                 return
             }
-
         }
-        // if (flag === 1) {
-        //     break
-        // }
     }
 }
 
 
+// let's the user play using the mouse
 function mousePressed() {
     let flag = 0
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             if (mouseX >= board[i][j].x && mouseX <= board[i][j].x + board[i][j].r && mouseY >= board[i][j].y && mouseY <= board[i][j].y + board[i][j].r) {
+
+                // move will only be possible if it is valid
                 let adjacentTiles = adjacentToBlankTiles(blank_i, blank_j, pseudo_board)
                 if (adjacentTiles.includes(board[i][j].name)) {
                     tilesReordered.push(board[i][j].name)
                     board[blank_i][blank_j].blank = false
                     board[blank_i][blank_j].name = board[i][j].name
                     pseudo_board[blank_i][blank_j] = pseudo_board[i][j]
-                    board[blank_i][blank_j].show(color(69, 105, 144))
+                    board[blank_i][blank_j].show(color(138, 198, 209))
                     board[i][j].blank = true
                     board[i][j].name = ""
                     pseudo_board[i][j] = ""
                     blank_i = i
                     blank_j = j
                     board[blank_i][blank_j].show(color(1111))
-                    console.log(tilesReordered)
+                    ordered = false
+                    console.log(tilesReordered, blank_i, blank_j)
                     flag = 1
                 }
             }
         }
         if (flag === 1) {
-            // console.log()
             break
         }
     }
 }
+
+
+// each tile on the board is an object of this type
 function Tile(i, j, name) {
     this.i = i
     this.j = j
-    this.r = 200
+    this.r = resolution
     this.x = this.i * this.r;
     this.y = this.j * this.r;
     this.name = name
     this.blank = false
+
+    // illustrates the tile's as a rectangle on the board
     this.show = (color) => {
         if (this.blank) {
-            fill(218, 212, 239);
+            fill(255, 227, 237);
             strokeWeight(1);
             stroke(64, 107, 129);
         }
         else {
             fill(color)
             strokeWeight(10);
-            stroke(228, 253, 225);
+            stroke(190, 235, 233);
         }
         rect(this.i * this.r, this.j * this.r, this.r - 1, this.r - 1);
         textSize(30);
         textAlign(CENTER);
-        fill(228, 253, 225)
+        fill(255, 253, 249)
         strokeWeight(5)
         stroke(64, 107, 129);
         text(`${this.name}`, this.i * this.r + this.r / 2, this.j * this.r + this.r / 1.5);
@@ -284,6 +395,8 @@ function Tile(i, j, name) {
 
 }
 
+
+// returns adjacent tiles of the blank tile
 function adjacentToBlankTiles(i, j, currentState) {
     let adjacentTiles = []
     if (i > 0) { adjacentTiles.push(currentState[i - 1][j]); console.log("i>0", currentState[i - 1][j]) }
@@ -293,24 +406,23 @@ function adjacentToBlankTiles(i, j, currentState) {
     return adjacentTiles
 }
 
+
+// Checks whether we've reached the goal state or not
 function inGoalState() {
     let name = 1
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++ , name++) {
             if (pseudo_board[j][i] != name && (i != 2 || j != 2)) {
-                console.log("in", name)
-                console.log(false)
                 return false
-
             }
-
-
         }
     }
-    console.log(true)
     return true
 }
 
+
+// Here we're calculating our huristics which is the manhattan distance
+// it is the sum of the cost of each tile to reach its goal state's position
 function manhattanDistance(board) {
     let cost = 0
     for (let i = 0; i < size; i++) {
@@ -331,41 +443,32 @@ function manhattanDistance(board) {
             }
         }
     }
-    console.log(cost)
+    // console.log(cost)
     return cost
 }
 
+
+// It is actually our priorityQ, it returns the state that has lowest f(n) value 
 function lowestFscoreState() {
     let minState = priorityQ[0];
-
-
     for (state of priorityQ) {
         if (state[3] < minState[3]) {
             minState = state;
-
         }
     }
     return minState
 }
 
+
+// here we're making a child state as a successor given a parent state as parameter
 function generateState(parentState, tile) {
     const childState = twoDArray(parentState.length, parentState.length)
     console.log("tilr,,,", tile)
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             if (parentState[i][j] === tile) {
-                // board[blank_i][blank_j].blank = false
                 childState[blank_i][blank_j] = parentState[i][j]
-                // pseudo_board[blank_i][blank_j] = pseudo_board[i][j]
-                // board[blank_i][blank_j].show(color(56, 140, 207))
-                // board[i][j].blank = true
-                // board[i][j].name = ""
                 childState[i][j] = ""
-                // blank_i = i
-                // blank_j = j
-                // board[blank_i][blank_j].show(color(1111))
-                // flag = 1
-                console.log("in middle", JSON.stringify(childState), blank_i, blank_j, ">>", i, j)
             }
             else {
                 if (parentState[i][j] !== "") {
@@ -378,7 +481,9 @@ function generateState(parentState, tile) {
     return childState
 }
 
-function setBlankTiles(currentState) {
+
+// it returns the position of the blank tile on a board
+function findBlankTile(currentState) {
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             if (currentState[i][j] === "") {
@@ -387,5 +492,4 @@ function setBlankTiles(currentState) {
             }
         }
     }
-
 }

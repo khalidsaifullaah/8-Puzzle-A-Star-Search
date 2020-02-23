@@ -1,4 +1,48 @@
 html{
-    background-color: rgb(17, 75, 95);
+    background-color: #fffdf9;
 }
- 
+.title{
+    color: #ff416c; /* fallback for old browsers */
+    color: -webkit-linear-gradient(to right, #ff416c, #ff4b2b); /* Chrome 10-25, Safari 5.1-6 */
+    color: linear-gradient(to right, #ff416c, #ff4b2b); 
+}
+body {
+    margin: 0;
+    background-color: #EBB;
+  }
+  .fit-image{
+    width: 100%;
+    object-fit: cover;
+    height: 300px; /* only if you want fixed height */
+    }
+
+  .lightbox {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, .5);
+    z-index: 1;
+  }
+  .toolbarLB {
+    text-align: right;
+    padding: 3px;
+  }
+  .closeLB {
+    color: #ab3c3c;
+    cursor: pointer;
+    font-weight: bolder;
+   
+  }
+  .lightbox .iframeContainer {
+    vertical-align: middle;
+    background: #CCC;
+    padding: 2px;
+  }
+  .lightbox.closed {
+    display: none;
+  }

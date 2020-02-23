@@ -1,46 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-        
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
-    <title>Document</title>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Document</title>
 </head>
+
 <body>
 </body>
+
 </html>
 
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- P5.js  -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.sound.min.js"></script>
-    <title>Hello, world!</title>
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-        <div id="sketch01" style="position: relative;"> </div>
-    <!-- <button id="somebutton" type="button" class="btn btn-success" onclick="start()">Start</button> -->
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- P5.js  -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.sound.min.js"></script>
+  <title>8 Puzzle</title>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="">
+    <div id="sketch01" style="position: relative;"> </div>
+  </div>
+
+  <!-- <button id="somebutton" type="button" class="btn btn-success" onclick="start()">Start</button> -->
+  <!-- the actual interesting bit -->
+  <div class="lightbox">
+    <div class="iframeContainer">
+      <div class="toolbarLB">
+        <span class="closeLB" onclick="lightBoxClose()">
+          <h3>X</h3>
+        </span>
+      </div>
+      <div class="card text-center">
+        <!-- <img class="card-img-top img-responsive" src="Document.png" alt=""> -->
+        
+          <div class="col-sm col-md col-lg">
+            <img src="8Puzzle.png" class="img-fluid">
+          </div>
+      
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Your goal is to <strong>solve the puzzle by ordering the tiles</strong> as shown in the
+          picture above.</h5>
+
+      </div>
+      <div class="card-footer text-muted text-center">
+
+          <span style="font-size:13px;">A.I Assignment:</span>
+          <a href="https://github.com/khalidsaifullaah" style="color: #ab3c3c;"><strong>KHALID SAIFULLAH</strong></a>
+          <img class="img-responsive center-block"  src="https://emojis.slackmojis.com/emojis/images/1450785773/250/mega.gif?1450785773" alt="">
+ 
+      </div>
+    </div>
 
 
-    <!-- Optional JavaScript -->
-    <script type="text/javascript" src="sketch.js"></script>
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </body>
+  </div>
+  </div>
+
+  <!-- <script src="sketch.js"></script> -->
+
+  <!-- Optional JavaScript -->
+  <script type="text/javascript" src="sketch.js"></script>
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+</body>
+
 </html>
