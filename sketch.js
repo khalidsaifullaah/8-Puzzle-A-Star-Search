@@ -96,13 +96,12 @@ function setup() {
 
     //creating A.I Help button
     startButton = createDiv('');
-    startButton.html('<button type="button" class="mt-5 btn btn-warning startBtn "><strong>Get A.I\'s Help</strong></button>');
+    startButton.html('<button type="button" class="mt-5 btn btn-lg btn-warning startBtn "><strong>Get A.I\'s Help</strong></button>');
     startButton.position(0, ((windowHeight - y_axis) / 4) + y_axis);
     startButton.style('font-size', '26px');
     startButton.style('width', '100%');
     startButton.style('text-align', 'center');
     let startBtn = document.querySelector(".startBtn");
-    startBtn.style.width = '20%'
     startBtn.setAttribute("id", "solveBtn")
     startBtn.addEventListener('mouseup', start)
     
