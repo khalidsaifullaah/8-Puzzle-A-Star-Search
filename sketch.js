@@ -108,8 +108,8 @@ function setup() {
     
 
     //some initial states for the board
-    pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
-    // pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
+//     pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
+    pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
     // pseudo_board = [[8, 5, 2], ["", 4, 3], [6, 7, 1]]
 
     //creating and visualizing the board
@@ -127,12 +127,12 @@ function setup() {
     }
 
     //keeping track of the blank tile
-    blank_i = 0
-    blank_j = 0
+    blank_i = 1
+    blank_j = 1
 
     //saving the initial position of the blank tile for visual purpose at the end
-    initial_i = 0
-    initial_j = 0
+    initial_i = 1
+    initial_j = 1
 
     //setting up the blank tile
     board[blank_i][blank_j].blank = true
