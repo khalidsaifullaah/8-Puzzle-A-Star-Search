@@ -28,6 +28,8 @@ let tilesReordered = []
 let calledFromTilesReordered = false
 let ordered = true
 
+// set it as "manhattan" or "misplaced" or "eucledian"
+let huristic_function = "manhattan"
 
 //Code for the pop up
 lightBoxClose = function () {
@@ -108,8 +110,8 @@ function setup() {
     
 
     //some initial states for the board
-    pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
-    // pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
+    // pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
+    pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
     // pseudo_board = [[8, 5, 2], ["", 4, 3], [6, 7, 1]]
 
     //creating and visualizing the board
@@ -120,6 +122,7 @@ function setup() {
             goal_board[name] = [j, i]
         }
     }
+    console.log(goal_board)
     for (let i = 0; i < size; i++) {
         for (let j = 0; j < size; j++) {
             board[i][j].show(color(138, 198, 209))
@@ -127,12 +130,12 @@ function setup() {
     }
 
     //keeping track of the blank tile
-    blank_i = 0
-    blank_j = 0
+    blank_i = 1
+    blank_j = 1
 
     //saving the initial position of the blank tile for visual purpose at the end
-    initial_i = 0
-    initial_j = 0
+    initial_i = 1
+    initial_j = 1
 
     //setting up the blank tile
     board[blank_i][blank_j].blank = true
@@ -140,7 +143,7 @@ function setup() {
     board[blank_i][blank_j].show(null)
 
     //pushing the initial state in the queue
-    let huristics = manhattanDistance(pseudo_board)
+    let huristics = huristic(pseudo_board)
     priorityQ.push([
         pseudo_board,
         0,
@@ -203,7 +206,7 @@ async function draw() {
             for (tile of adjacentTiles) {
                 const nextState = generateState(currentState, tile)
                 if (JSON.stringify(nextState) != JSON.stringify(previousNode)) {
-                    const huristics = manhattanDistance(nextState)
+                    const huristics = huristic(nextState)
                     const gScore = current[1] + 1
                     const fScore = huristics + gScore
                     priorityQ.push([
@@ -420,6 +423,17 @@ function inGoalState() {
     return true
 }
 
+function huristic(board){
+    if(huristic_function === 'manhattan'){
+        return manhattanDistance(board)
+    }
+    else if(huristic_function === 'misplaced'){
+        return misplacedTiles(board)
+    }
+    else{
+        return eucledianDistance(board)
+    }
+}
 
 // Here we're calculating our huristics which is the manhattan distance
 // it is the sum of the cost of each tile to reach its goal state's position
@@ -447,6 +461,40 @@ function manhattanDistance(board) {
     return cost
 }
 
+function misplacedTiles(board) {
+    let cost = 0
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            currentTile = board[i][j]
+            goalPosition = goal_board[currentTile]
+            if (currentTile != "") {
+                if(i != goalPosition[0] || j != goalPosition[1]){
+                    cost += 1
+                }
+            }
+        }
+    }
+    console.log("misplaced---",cost)
+    return cost
+}
+
+function eucledianDistance(board) {
+    let cost = 0
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            currentTile = board[i][j]
+            goalPosition = goal_board[currentTile]
+            if (currentTile != "") {
+                xdiff = Math.pow((i-goalPosition[0]),2)
+                ydiff = Math.pow((j-goalPosition[1]),2)
+                cost += Math.sqrt( xdiff + ydiff)
+                console.log(`tile---${currentTile}`,Math.sqrt( xdiff + ydiff))
+            }
+        }
+    }
+    console.log("eucledian---",cost)
+    return cost
+}
 
 // It is actually our priorityQ, it returns the state that has lowest f(n) value 
 function lowestFscoreState() {
