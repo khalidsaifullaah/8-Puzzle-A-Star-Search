@@ -1,14 +1,10 @@
 html{
     background-color: #fffdf9;
 }
-.title{
-    color: #ff416c; /* fallback for old browsers */
-    color: -webkit-linear-gradient(to right, #ff416c, #ff4b2b); /* Chrome 10-25, Safari 5.1-6 */
-    color: linear-gradient(to right, #ff416c, #ff4b2b); 
-}
+
 body {
     margin: 0;
-    background-color: #EBB;
+    /* background-color: #EBB; */
   }
   .fit-image{
     width: 100%;

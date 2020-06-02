@@ -39,7 +39,7 @@ lightBoxClose = function () {
 
 // Centers the canvas on screen
 function centerCanvas(x, y) {
-    screen.position((windowWidth - x) / 2, (windowHeight - y) / 4);
+    screen.position((windowWidth - x) / 2, (windowHeight - y) / 4+30);
 }
 
 
@@ -85,39 +85,74 @@ function setup() {
     board = twoDArray(size, size)
     pseudo_board = twoDArray(size, size)
 
-    //title creation
-    titleDiv = createDiv('');
-    titleDiv.html('<h2 class = "title"><strong><u>8 Puzzle</u></strong></h2>');
-    titleDiv.position(0, 10);
-    titleDiv.style('font-size', '26px');
-    titleDiv.style('width', '100%');
-    titleDiv.style('text-align', 'center');
-    // let startBtn = document.querySelector(".startBtn");
-    // startBtn.style.width = '20%'
-    // startBtn.setAttribute("id", "solveBtn")
-    // startBtn.addEventListener('mouseup', start)
-
     //creating A.I Help button
     startButton = createDiv('');
-    startButton.html('<button type="button" class="mt-5 btn btn-lg btn-warning startBtn "><strong>Get A.I\'s Help</strong></button>');
+    startButton.html('<button type="button" class="mt-5 btn btn-lg btn-warning startBtn ">Get A.I\'s Help</button>');
     startButton.position(0, ((windowHeight - y_axis) / 4) + y_axis);
     startButton.style('font-size', '26px');
     startButton.style('width', '100%');
     startButton.style('text-align', 'center');
     let startBtn = document.querySelector(".startBtn");
+    startBtn.style.backgroundColor = "#23272b"
+    startBtn.style.color = "white"
     startBtn.setAttribute("id", "solveBtn")
     startBtn.addEventListener('mouseup', start)
-    
+
 
     //some initial states for the board
-    // pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
-    pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
-    // pseudo_board = [[8, 5, 2], ["", 4, 3], [6, 7, 1]]
+    // Choosing a random state of the puzzle from some given one
+    chooseRandomState = Math.floor((Math.random() * 4) + 1);
+    // chooseRandomState = 4
+    if(chooseRandomState === 1){
+        pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
+        //keeping track of the blank tile
+        blank_i = 0
+        blank_j = 0
+        //saving the initial position of the blank tile for visual purpose at the end
+        initial_i = 0
+        initial_j = 0
+    }
+    else if(chooseRandomState === 2){
+        pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
+        //keeping track of the blank tile
+        blank_i = 1
+        blank_j = 1
+        //saving the initial position of the blank tile for visual purpose at the end
+        initial_i = 1
+        initial_j = 1
+    }
+    else if(chooseRandomState === 3){
+        pseudo_board = [[1, 8, 3], [5, 2, 7], [4, "", 6]]
+        //keeping track of the blank tile
+        blank_i = 2
+        blank_j = 1
+        //saving the initial position of the blank tile for visual purpose at the end
+        initial_i = 2
+        initial_j = 1
+    }
+    else if(chooseRandomState === 4){
+        pseudo_board = [[1, 5, 3], [2, 4, 7], [6, 8, ""]]
+        //keeping track of the blank tile
+        blank_i = 2
+        blank_j = 2
+        //saving the initial position of the blank tile for visual purpose at the end
+        initial_i = 2
+        initial_j = 2
+    }
+    else{
+        pseudo_board = [[7, 5, 8], [2, "", 3], [4, 6, 1]]
+        //keeping track of the blank tile
+        blank_i = 1
+        blank_j = 1
+        //saving the initial position of the blank tile for visual purpose at the end
+        initial_i = 1
+        initial_j = 1
+    }
 
     //creating and visualizing the board
     let name = 1
     for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++ , name++) {
+        for (let j = 0; j < size; j++, name++) {
             board[i][j] = new Tile(i, j, pseudo_board[i][j])
             goal_board[name] = [j, i]
         }
@@ -129,13 +164,6 @@ function setup() {
         }
     }
 
-    //keeping track of the blank tile
-    blank_i = 1
-    blank_j = 1
-
-    //saving the initial position of the blank tile for visual purpose at the end
-    initial_i = 1
-    initial_j = 1
 
     //setting up the blank tile
     board[blank_i][blank_j].blank = true
@@ -188,6 +216,9 @@ async function draw() {
             // taking the state/node from the queue which has the lowest f(n); where f(n) = g(n)+h(n)
             const current = lowestFscoreState()
             moves++
+            //Updating the counter on the screen for "move++"
+            var counterMsg = document.querySelector(".counter")
+            counterMsg.innerHTML = `${moves}`
 
             // it contains the board of the current "best" state
             const currentState = current[0]
@@ -218,7 +249,6 @@ async function draw() {
                     ])
                 }
             }
-
 
             // setting our board's (pseudo board) value as like the best board at the moment 
             // which is the board of the current state
@@ -259,22 +289,19 @@ async function draw() {
 
             // Here we terminate our game by showing some message to the user
             else {
-                // puzzle solve message
+                // puzzle solve message and play again prompt button
                 var div = createDiv('');
-                div.html('<h1>Puzzle is solved!</h1>');
-                div.position(0, ((windowHeight - y_axis) / 4) + y_axis + 100);
-                div.style('font-size', '24px');
+                div.html(`  <div class="container">
+                <div class="row justify-content-center">
+                  <div class="col text-center">
+                    <p style="opacity:0.7;font-size:24px;">Puzzle is <span style="color:rgb(206, 15, 61);">solved!</span></p>
+                    <button type="button" class="btn btn-success" style="background-color: #142850;"
+                      onClick="window.location.reload();">Play Again</button>
+                  </div>
+                </div>
+              </div>`);
+                div.position(0, ((windowHeight - y_axis) / 4) + y_axis + 150);
                 div.style('width', '100%');
-                div.style('text-align', 'center');
-                div.style('color', 'rgb(206, 15, 61)');
-
-                // play again prompt button
-                var div2 = createDiv('');
-                div2.html('<button type="button" class="btn btn-success" style = "background-color: #142850;" onClick="window.location.reload();">Play Again</button>');
-                div2.position(0, ((windowHeight - y_axis) / 4) + y_axis + 150);
-                div2.style('font-size', '24px');
-                div2.style('width', '100%');
-                div2.style('text-align', 'center');
 
                 // disabling the solve button
                 const startBtn = document.getElementsByClassName("startBtn");
@@ -283,7 +310,7 @@ async function draw() {
                 startBtn[0].style.backgroundColor = 'rgb(150, 119, 119)'
                 startBtn[0].textContent = "Solved!";
                 noLoop();
-                console.log(`We're Done with ${moves - 1} moves!`)
+                console.log(`We're Done with ${moves - 1} lookups!`)
             }
         }
     }
@@ -293,12 +320,41 @@ async function draw() {
 // When start button is clicked, the function executes and the algorithm starts
 function start() {
     tilesReordered = tilesReordered.reverse()
-
+    
+    // updating start buttons inner text
     var startBtn = document.querySelector(".startBtn")
+    startBtn.disabled = true
+    startBtn.style.opacity = "1"
     startBtn.style.backgroundColor = "#23272b"
     startBtn.style.color = "white"
     startBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm text-danger" role="status" aria-hidden="true"></span> Solving...'
     
+
+    // play again prompt button
+    var div2 = createDiv('');
+    div2.html('<h2 style = "display:inline;">Combinations Tried: </h2> <h2 style = "display:inline;"><span class = "counter" style="color:rgb(206, 15, 61);">0</span></h2>');
+    div2.position(0, ((windowHeight - y_axis) / 4) + y_axis + 110);
+    div2.style('width', '100%');
+    div2.style('text-align', 'center');
+    let counterMsg = document.querySelector(".counter");
+    counterMsg.setAttribute("id", "counter")
+
+    // Checking users choice for huristic
+    const huristic_choice = document.getElementById("inputGroupSelect01");
+    userHuristicChoice = huristic_choice.value
+    if(userHuristicChoice == 1){
+        huristic_function = "manhattan"
+    }
+    else if(userHuristicChoice == 2){
+        huristic_function = "eucledian"
+    }
+    else if(userHuristicChoice == 3){
+        huristic_function = "misplaced"
+    }
+    else{
+        // giving the default huristic manhattand distance if user doesn't choose
+        huristic_function = "manhattan"
+    }
     started = true;
     loop();
 }
@@ -414,7 +470,7 @@ function adjacentToBlankTiles(i, j, currentState) {
 function inGoalState() {
     let name = 1
     for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++ , name++) {
+        for (let j = 0; j < size; j++, name++) {
             if (pseudo_board[j][i] != name && (i != 2 || j != 2)) {
                 return false
             }
@@ -423,14 +479,14 @@ function inGoalState() {
     return true
 }
 
-function huristic(board){
-    if(huristic_function === 'manhattan'){
+function huristic(board) {
+    if (huristic_function === 'manhattan') {
         return manhattanDistance(board)
     }
-    else if(huristic_function === 'misplaced'){
+    else if (huristic_function === 'misplaced') {
         return misplacedTiles(board)
     }
-    else{
+    else {
         return eucledianDistance(board)
     }
 }
@@ -468,13 +524,13 @@ function misplacedTiles(board) {
             currentTile = board[i][j]
             goalPosition = goal_board[currentTile]
             if (currentTile != "") {
-                if(i != goalPosition[0] || j != goalPosition[1]){
+                if (i != goalPosition[0] || j != goalPosition[1]) {
                     cost += 1
                 }
             }
         }
     }
-    console.log("misplaced---",cost)
+    console.log("misplaced---", cost)
     return cost
 }
 
@@ -485,14 +541,14 @@ function eucledianDistance(board) {
             currentTile = board[i][j]
             goalPosition = goal_board[currentTile]
             if (currentTile != "") {
-                xdiff = Math.pow((i-goalPosition[0]),2)
-                ydiff = Math.pow((j-goalPosition[1]),2)
-                cost += Math.sqrt( xdiff + ydiff)
-                console.log(`tile---${currentTile}`,Math.sqrt( xdiff + ydiff))
+                xdiff = Math.pow((i - goalPosition[0]), 2)
+                ydiff = Math.pow((j - goalPosition[1]), 2)
+                cost += Math.sqrt(xdiff + ydiff)
+                console.log(`tile---${currentTile}`, Math.sqrt(xdiff + ydiff))
             }
         }
     }
-    console.log("eucledian---",cost)
+    console.log("eucledian---", cost)
     return cost
 }
 
