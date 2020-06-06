@@ -39,7 +39,7 @@ lightBoxClose = function () {
 
 // Centers the canvas on screen
 function centerCanvas(x, y) {
-    screen.position((windowWidth - x) / 2, (windowHeight - y) / 4+30);
+    screen.position((windowWidth - x) / 2, (windowHeight - y) / 4 + 30);
 }
 
 
@@ -99,11 +99,11 @@ function setup() {
     startBtn.addEventListener('mouseup', start)
 
 
-    //some initial states for the board
-    // Choosing a random state of the puzzle from some given one
-    chooseRandomState = Math.floor((Math.random() * 4) + 1);
-    // chooseRandomState = 4
-    if(chooseRandomState === 1){
+    //some initial states for the board are prepared
+    // Choosing a random state of the puzzle from some given ones
+    // chooseRandomState = Math.floor((Math.random() * 4) + 1);
+    chooseRandomState = 2
+    if (chooseRandomState === 1) {
         pseudo_board = [["", 4, 7], [1, 2, 8], [3, 5, 6]]
         //keeping track of the blank tile
         blank_i = 0
@@ -112,7 +112,7 @@ function setup() {
         initial_i = 0
         initial_j = 0
     }
-    else if(chooseRandomState === 2){
+    else if (chooseRandomState === 2) {
         pseudo_board = [[8, 4, 7], [1, "", 6], [3, 2, 5]]
         //keeping track of the blank tile
         blank_i = 1
@@ -121,7 +121,7 @@ function setup() {
         initial_i = 1
         initial_j = 1
     }
-    else if(chooseRandomState === 3){
+    else if (chooseRandomState === 3) {
         pseudo_board = [[1, 8, 3], [5, 2, 7], [4, "", 6]]
         //keeping track of the blank tile
         blank_i = 2
@@ -130,7 +130,7 @@ function setup() {
         initial_i = 2
         initial_j = 1
     }
-    else if(chooseRandomState === 4){
+    else if (chooseRandomState === 4) {
         pseudo_board = [[1, 5, 3], [2, 4, 7], [6, 8, ""]]
         //keeping track of the blank tile
         blank_i = 2
@@ -139,7 +139,7 @@ function setup() {
         initial_i = 2
         initial_j = 2
     }
-    else{
+    else {
         pseudo_board = [[7, 5, 8], [2, "", 3], [4, 6, 1]]
         //keeping track of the blank tile
         blank_i = 1
@@ -320,7 +320,7 @@ async function draw() {
 // When start button is clicked, the function executes and the algorithm starts
 function start() {
     tilesReordered = tilesReordered.reverse()
-    
+
     // updating start buttons inner text
     var startBtn = document.querySelector(".startBtn")
     startBtn.disabled = true
@@ -328,7 +328,7 @@ function start() {
     startBtn.style.backgroundColor = "#23272b"
     startBtn.style.color = "white"
     startBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm text-danger" role="status" aria-hidden="true"></span> Solving...'
-    
+
 
     // play again prompt button
     var div2 = createDiv('');
@@ -342,16 +342,16 @@ function start() {
     // Checking users choice for huristic
     const huristic_choice = document.getElementById("inputGroupSelect01");
     userHuristicChoice = huristic_choice.value
-    if(userHuristicChoice == 1){
+    if (userHuristicChoice == 1) {
         huristic_function = "manhattan"
     }
-    else if(userHuristicChoice == 2){
+    else if (userHuristicChoice == 2) {
         huristic_function = "eucledian"
     }
-    else if(userHuristicChoice == 3){
+    else if (userHuristicChoice == 3) {
         huristic_function = "misplaced"
     }
-    else{
+    else {
         // giving the default huristic manhattand distance if user doesn't choose
         huristic_function = "manhattan"
     }
